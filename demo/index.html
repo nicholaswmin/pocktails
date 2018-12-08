@@ -42,6 +42,8 @@
           this.list.addEventListener('click', e => {
             if (e.target.classList.contains('delete-todo-btn'))
               this.deleteTodo(e)
+            else if (e.target.classList.contains('edit-todo-btn'))
+              this.editTodo(e)
           })
         }
 
@@ -54,6 +56,11 @@
                   data-id="${todo.id}"
                   class="delete-todo-btn">
                   X
+                </button>
+                <button
+                  data-id="${todo.id}"
+                  class="edit-todo-btn">
+                  Edit
                 </button>
                 <span>${todo.content}</span>
               </li>
@@ -77,13 +84,23 @@
         }
 
         deleteTodo(e) {
-          const todoId = e.target.getAttribute('data-id')
-          const fromIndex = pocktails.models.todos.items.findIndex(todo => {
-            return todo.id === todoId
+          const id = e.target.getAttribute('data-id')
+          const index = pocktails.models.todos.items.findIndex(todo => {
+            return todo.id === id
           })
 
-          pocktails.splice('todos', 'items', fromIndex, 1)
+          pocktails.splice('todos', 'items', index, 1)
         }
+
+        editTodo(e) {
+          const id = e.target.getAttribute('data-id')
+          const index = pocktails.models.todos.items.findIndex(todo => {
+            return todo.id === id
+          })
+
+          pocktails.set('todos', `items.${index}.content`, prompt('Type new content'))
+        }
+
 
         getUUID() {
           return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {

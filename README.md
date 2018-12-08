@@ -36,15 +36,17 @@ pocktails.revive()
 <script>
   const pocktails = new Pocktails()
 
+  // Edit existing todo:
+  pocktails.set('todos', 'items.1.content', 'Get Beer')
+
   // Add a new todo:
   pocktails.push('todos', 'items', {
     id: '84car114-xxrh-8873-9vt2-3a4x4d99rtx1',
     content: 'Get Eggs'
   })
 
-  // Edit newly-added todo:
-  pocktails.set('todos', 'items.1.content', 'Get Beer')
-
+  // Optionally, remove the 1st (pre-existing) todo:
+  pocktails.splice('todos', 'items', 0, 1)
 </script>
 ```
 
