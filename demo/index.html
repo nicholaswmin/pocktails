@@ -11,20 +11,34 @@
         font-family: sans-serif;
       }
 
-      .todo span {
-        display: inline-block;
-        margin: 12px 8px;
+      .todo-list {
+        max-width: 320px;
+        margin: 32px auto;
+        border: 1px solid #ccc;
+        padding: 0 8px 12px 8px;
+      }
+
+      #add-todo-btn {
+        margin: 8px 0px;
+      }
+
+      table {
+        border-collapse: collapse;
+      }
+
+      table, th, td {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
       }
     </style>
   </head>
 
   <body>
-    <h3> Todos </h3>
-
     <div class="todo-list">
-      <input type="text" id="todo-input"/>
-      <button id="add-todo-btn">Add Todo</button>
-      <ul id="list"></ul>
+      <h3> My Todos </h3>
+      <button id="add-todo-btn">Add New</button>
+      <table id="list"></table>
     </div>
 
     <script>
@@ -32,7 +46,6 @@
 
       class TodoList {
         constructor() {
-          this.todoInput = document.querySelector('#todo-input')
           this.addTodoBtn = document.querySelector('#add-todo-btn')
           this.list = document.querySelector('#list')
 
@@ -51,19 +64,23 @@
           const list = document.querySelector('#list')
           const todosHTML = pocktails.models.todos.items.map(todo => {
             return `
-              <li class="todo">
-                <button
-                  data-id="${todo.id}"
-                  class="delete-todo-btn">
-                  X
-                </button>
+            <tr>
+              <td class="content">${todo.content}</td>
+              <td>
                 <button
                   data-id="${todo.id}"
                   class="edit-todo-btn">
                   Edit
                 </button>
-                <span>${todo.content}</span>
-              </li>
+              </td>
+              <td>
+              <button
+                data-id="${todo.id}"
+                class="delete-todo-btn">
+                X
+              </button>
+              </td>
+            </tr>
             `.trim()
           })
 
@@ -71,36 +88,29 @@
         }
 
         addTodo() {
-          const content = this.todoInput.value
-
-          if (!content.trim()) return alert('Todo must have content')
-
           pocktails.push('todos', 'items', {
             id: this.getUUID(),
-            content
+            content: prompt('Type Todo content')
           })
 
           this.rebuildTodosList()
         }
 
         deleteTodo(e) {
-          const id = e.target.getAttribute('data-id')
           const index = pocktails.models.todos.items.findIndex(todo => {
-            return todo.id === id
+            return todo.id === e.target.getAttribute('data-id')
           })
 
           pocktails.splice('todos', 'items', index, 1)
         }
 
         editTodo(e) {
-          const id = e.target.getAttribute('data-id')
           const index = pocktails.models.todos.items.findIndex(todo => {
-            return todo.id === id
+            return todo.id === e.target.getAttribute('data-id')
           })
 
           pocktails.set('todos', `items.${index}.content`, prompt('Type new content'))
         }
-
 
         getUUID() {
           return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
