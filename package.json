@@ -1,0 +1,33 @@
+{
+  "name": "pocktails",
+  "version": "0.1.0",
+  "description": "Real-time JSON models",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nicholaswmin/pocktails.git"
+  },
+  "keywords": [
+    "real-time",
+    "json",
+    "sync",
+    "models"
+  ],
+  "author": "@nicholaswmin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nicholaswmin/pocktails/issues"
+  },
+  "homepage": "https://github.com/nicholaswmin/pocktails#readme",
+  "devDependencies": {
+    "express": "^4.16.4",
+    "socket.io": "^2.2.0"
+  },
+  "dependencies": {
+    "jsondiffpatch": "^0.3.11",
+    "pathval": "^1.1.0"
+  }
+}
