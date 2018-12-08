@@ -4,7 +4,8 @@
   "description": "Real-time JSON models",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "demo": "node demo/index.js"
   },
   "repository": {
     "type": "git",
@@ -27,7 +28,6 @@
     "socket.io": "^2.2.0"
   },
   "dependencies": {
-    "jsondiffpatch": "^0.3.11",
     "pathval": "^1.1.0"
   }
 }

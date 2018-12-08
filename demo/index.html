@@ -4,7 +4,6 @@
     <title>Pocktails Todo Demo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
     <script src="sdk/pathval.js"></script>
-    <script src="sdk/jsondiffpatch.js"></script>
     <script src="sdk/sdk.js"></script>
 
     <style>
@@ -48,7 +47,7 @@
 
         rebuildTodosList() {
           const list = document.querySelector('#list')
-          const todosHTML = pocktails.models.todo.todos.map(todo => {
+          const todosHTML = pocktails.models.todos.items.map(todo => {
             return `
               <li class="todo">
                 <button
@@ -69,8 +68,8 @@
 
           if (!content.trim()) return alert('Todo must have content')
 
-          pocktails.push('todo', 'todos', {
-            id: Math.random().toString(),
+          pocktails.push('todos', 'items', {
+            id: this.getUUID(),
             content
           })
 
@@ -79,10 +78,19 @@
 
         deleteTodo(e) {
           const todoId = e.target.getAttribute('data-id')
-          const fromIndex = pocktails.models.todo.todos
-            .findIndex(todo => todo.id === todoId)
+          const fromIndex = pocktails.models.todos.items.findIndex(todo => {
+            return todo.id === todoId
+          })
 
-          pocktails.splice('todo', 'todos', fromIndex, 1)
+          pocktails.splice('todos', 'items', fromIndex, 1)
+        }
+
+        getUUID() {
+          return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+            const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8)
+
+            return v.toString(16)
+          })
         }
       }
 

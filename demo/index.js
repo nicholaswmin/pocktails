@@ -8,30 +8,19 @@ const Pocktails = require('../index.js')
 
 const pocktails = new Pocktails(io)
 
-pocktails.defineModel('person', {
-  name: 'John Doe',
-  age: 13,
-  children: [
-    'Foo',
-    'Bar'
-  ]
-}).defineModel('todo', {
-  owner: 'John Doe',
-  todos: [
-    { id: 'lxgiis23', content: 'Get Milk' }
+pocktails.defineModel('todos', {
+  items: [
+    { id: '64bbd83a-b1ed-4254-9aee-1e4e6d85fdb7', content: 'Get Milk' }
   ]
 })
 
+// Revive model from previous disk-persisted operations
 pocktails.revive()
 
 app.use('/sdk', express.static(__dirname + '/../sdk'))
 
-app.get('/', (req, res) => {
+app.get('/demo', (req, res) => {
   res.sendFile(__dirname + '/index.html')
-})
-
-app.get('/todo', (req, res) => {
-  res.sendFile(__dirname + '/todo.html')
 })
 
 http.listen(3000, () => {

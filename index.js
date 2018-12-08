@@ -2,28 +2,20 @@
 
 const fs = require('fs')
 const pathval = require('pathval')
-const jsondiffpatch = require('jsondiffpatch')
-
-/*
-  @TODO's:
-
-  - Diffing/Patching is unnecessary. The operations themselves could
-    serve as deltas.
- */
 
 class Pocktails {
   constructor(io) {
     this.models = {}
     this.io = io
-    this.filename = '.diffs.pocktails'
+    this.filename = '.operations.pocktails'
 
     this.io.on('connection', socket => {
       socket.emit('handshake', this.models)
 
       socket.on('operation', operation => {
-        const diff = this.applyOperation(operation)
+        this._applyOperation(operation)
 
-        socket.broadcast.emit('diff', diff)
+        socket.broadcast.emit('operation', operation)
       })
     })
   }
@@ -43,14 +35,13 @@ class Pocktails {
       .split('\n')
       .filter(str => str)
       .map(JSON.parse)
-      .forEach(diff => {
-        jsondiffpatch.patch(this.models[diff.modelName], diff.delta)
+      .forEach(operation => {
+        this._applyOperation(operation, true)
       })
   }
 
-  applyOperation(operation) {
+  _applyOperation(operation, doNotPersist) {
     const model = this.models[operation.modelName]
-    const current = this._deepCloneObject(model)
 
     // @TODO Use `.defineOperation(type: Operation)`, see Open/Closed OOP princ.
     switch (operation.type) {
@@ -78,26 +69,13 @@ class Pocktails {
         console.error('Unrecognized operation type:', operation.type)
     }
 
+    if (doNotPersist) return
 
-    const diff = this._getDiff(operation.modelName, current, model)
-
-    this._persistDiff(diff)
-
-    return diff
+    this._persistOperation(operation)
   }
 
-  _getDiff(modelName, prevModel, newModel) {
-    const delta = jsondiffpatch.diff(prevModel, newModel)
-
-    return { modelName, delta }
-  }
-
-  _persistDiff(diff) {
-    fs.appendFileSync(this.filename, JSON.stringify(diff) + '\n')
-  }
-
-  _deepCloneObject(obj) {
-    return JSON.parse(JSON.stringify(obj))
+  _persistOperation(operation) {
+    fs.appendFileSync(this.filename, JSON.stringify(operation) + '\n')
   }
 }
 

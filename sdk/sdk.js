@@ -12,40 +12,56 @@ class Pocktails {
       this.fireListener('handshake')
     })
 
-    this.socket.on('diff', diff => {
-      jsondiffpatch.patch(this.models[diff.modelName], diff.delta)
+    this.socket.on('operation', operation => {
+      this.applyOperation(operation, true)
       this.fireListener('update')
     })
   }
 
-  set(modelName, path, value) {
-    pathval.setPathValue(this.models[modelName], path, value)
+  applyOperation(operation, doNotPublish) {
+    const model = this.models[operation.modelName]
 
-    this._publishOperation({ type: 'set', modelName, path, value })
+    // @TODO Use `.defineOperation(type: Operation)`, see Open/Closed OOP princ.
+    switch (operation.type) {
+      case 'set': {
+        pathval.setPathValue(model, operation.path, operation.value)
+        break;
+      }
+
+      case 'push': {
+        const arr = pathval.getPathValue(model, operation.path)
+
+        arr.push(operation.value)
+        break;
+      }
+
+      case 'splice': {
+        const model = this.models[operation.modelName]
+        const arr = pathval.getPathValue(model, operation.path)
+
+        arr.splice(operation.fromIndex, operation.toIndex)
+        break;
+      }
+
+      default:
+        console.error('Unrecognized operation type:', operation.type)
+    }
+
+    if (doNotPublish) return
+
+    this._publishOperation(operation)
+  }
+
+  set(modelName, path, value) {
+    this.applyOperation({ type: 'set', modelName, path, value })
   }
 
   push(modelName, path, value) {
-    const model = this.models[modelName]
-    const arr = pathval.getPathValue(model, path)
-
-    arr.push(value)
-
-    this._publishOperation({ type: 'push', modelName, path, value })
+    this.applyOperation({ type: 'push', modelName, path, value })
   }
 
   splice(modelName, path, fromIndex, toIndex) {
-    const model = this.models[modelName]
-    const arr = pathval.getPathValue(model, path)
-
-    arr.splice(fromIndex, toIndex)
-
-    this._publishOperation({
-      type: 'splice',
-      modelName,
-      path,
-      fromIndex,
-      toIndex
-    })
+    this.applyOperation({ type: 'splice', modelName, path, fromIndex, toIndex })
   }
 
   addEventListener(name, callback) {
