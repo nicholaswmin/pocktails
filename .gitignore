@@ -3,6 +3,9 @@ logs
 *.log
 npm-debug.log*
 
+# Pocktail Diffs
+*.pocktails
+
 # Runtime data
 pids
 *.pid

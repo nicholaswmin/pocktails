@@ -28,6 +28,8 @@ class Pocktails {
   }
 
   revive() {
+    if (!fs.existsSync(this.filename)) return
+
     fs.readFileSync(this.filename, { encoding: 'utf8' })
       .split('\n')
       .filter(str => str)
