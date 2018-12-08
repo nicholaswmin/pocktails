@@ -25,6 +25,8 @@ class Pocktails {
     Object.assign(this.models, {
       [name]: model
     })
+
+    return this
   }
 
   revive() {
@@ -39,28 +41,38 @@ class Pocktails {
       })
   }
 
-  applyOperation({ type, modelName, path, value }) {
-    const model = this.models[modelName]
+  applyOperation(operation) {
+    const model = this.models[operation.modelName]
     const current = this._deepCloneObject(model)
 
     // @TODO Use `.defineOperation(type: Operation)`, see Open/Closed OOP princ.
-    switch (type) {
-      case 'set':
-        pathval.setPathValue(model, path, value)
+    switch (operation.type) {
+      case 'set': {
+        pathval.setPathValue(model, operation.path, operation.value)
         break;
+      }
 
-      case 'push':
-        const arr = pathval.getPathValue(model, path)
+      case 'push': {
+        const arr = pathval.getPathValue(model, operation.path)
 
-        arr.push(value)
+        arr.push(operation.value)
         break;
+      }
+
+      case 'splice': {
+        const model = this.models[operation.modelName]
+        const arr = pathval.getPathValue(model, operation.path)
+
+        arr.splice(operation.fromIndex, operation.toIndex)
+        break;
+      }
 
       default:
         console.error('Unrecognized operation type:', operation.type)
     }
 
 
-    const diff = this._getDiff(modelName, current, model)
+    const diff = this._getDiff(operation.modelName, current, model)
 
     this._persistDiff(diff)
 

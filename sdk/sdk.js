@@ -33,6 +33,21 @@ class Pocktails {
     this._publishOperation({ type: 'push', modelName, path, value })
   }
 
+  splice(modelName, path, fromIndex, toIndex) {
+    const model = this.models[modelName]
+    const arr = pathval.getPathValue(model, path)
+
+    arr.splice(fromIndex, toIndex)
+
+    this._publishOperation({
+      type: 'splice',
+      modelName,
+      path,
+      fromIndex,
+      toIndex
+    })
+  }
+
   addEventListener(name, callback) {
     const existing = this.listeners[name]
 

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Pocktails Todo Demo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script src="sdk/pathval.js"></script>
+    <script src="sdk/jsondiffpatch.js"></script>
+    <script src="sdk/sdk.js"></script>
+
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+
+      .todo span {
+        display: inline-block;
+        margin: 12px 8px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h3> Todos </h3>
+
+    <input type="text" id="todo-input"/>
+    <button id="add-todo-btn">Add Todo</button>
+
+    <ul id="list">
+    </ul>
+
+    <script>
+      const pocktails = new Pocktails()
+
+      class TodoList {
+        constructor() {
+          this.todoInput = document.querySelector('#todo-input')
+          this.addTodoBtn = document.querySelector('#add-todo-btn')
+          this.list = document.querySelector('#list')
+
+          pocktails.addEventListener('handshake', this.rebuildTodosList.bind(this))
+          pocktails.addEventListener('update', this.rebuildTodosList.bind(this))
+          this.addTodoBtn.addEventListener('click', this.addTodo.bind(this))
+          this.list.addEventListener('click', e => {
+            if (e.target.classList.contains('delete-todo-btn'))
+              this.deleteTodo(e)
+          })
+        }
+
+        rebuildTodosList() {
+          const list = document.querySelector('#list')
+          const todosHTML = pocktails.models.todo.todos.map(todo => {
+            return `
+              <li class="todo">
+                <button
+                  data-id="${todo.id}"
+                  class="delete-todo-btn">
+                  X
+                </button>
+                <span>${todo.content}</span>
+              </li>
+            `.trim()
+          })
+
+          list.innerHTML = todosHTML.join('')
+        }
+
+        addTodo() {
+          const content = this.todoInput.value
+
+          if (!content.trim()) return alert('Todo must have content')
+
+          pocktails.push('todo', 'todos', {
+            id: Math.random().toString(),
+            content
+          })
+
+          this.rebuildTodosList()
+        }
+
+        deleteTodo(e) {
+          const todoId = e.target.getAttribute('data-id')
+          const fromIndex = pocktails.models.todo.todos
+            .findIndex(todo => todo.id === todoId)
+
+          pocktails.splice('todo', 'todos', fromIndex, 1)
+        }
+      }
+
+      new TodoList()
+    </script>
+  </body>
+</html>
