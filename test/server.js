@@ -17,6 +17,8 @@ pocktails.defineModel('person', {
   ]
 })
 
+pocktails.revive()
+
 app.use('/sdk', express.static(__dirname + '/../sdk'))
 
 app.get('/', (req, res) => {

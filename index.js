@@ -1,5 +1,6 @@
 'use strict'
 
+const fs = require('fs')
 const pathval = require('pathval')
 const jsondiffpatch = require('jsondiffpatch')
 
@@ -7,6 +8,7 @@ class Pocktails {
   constructor(io) {
     this.models = {}
     this.io = io
+    this.filename = '.diffs.pocktails'
 
     this.io.on('connection', socket => {
       socket.emit('handshake', this.models)
@@ -25,6 +27,16 @@ class Pocktails {
     })
   }
 
+  revive() {
+    fs.readFileSync(this.filename, { encoding: 'utf8' })
+      .split('\n')
+      .filter(str => str)
+      .map(JSON.parse)
+      .forEach(diff => {
+        jsondiffpatch.patch(this.models[diff.modelName], diff.delta)
+      })
+  }
+
   applyOperation({ type, modelName, path, value }) {
     const model = this.models[modelName]
     const current = this._deepCloneObject(model)
@@ -33,27 +45,34 @@ class Pocktails {
     switch (type) {
       case 'set':
         pathval.setPathValue(model, path, value)
-
-        return this._getDiff(modelName, current, model)
         break;
 
       case 'push':
         const arr = pathval.getPathValue(model, path)
 
         arr.push(value)
-
-        return this._getDiff(modelName, current, model)
         break;
 
       default:
         console.error('Unrecognized operation type:', operation.type)
     }
+
+
+    const diff = this._getDiff(modelName, current, model)
+
+    this._persistDiff(diff)
+
+    return diff
   }
 
   _getDiff(modelName, prevModel, newModel) {
     const delta = jsondiffpatch.diff(prevModel, newModel)
 
     return { modelName, delta }
+  }
+
+  _persistDiff(diff) {
+    fs.appendFileSync(this.filename, JSON.stringify(diff) + '\n')
   }
 
   _deepCloneObject(obj) {
