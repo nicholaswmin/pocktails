@@ -4,12 +4,18 @@
 
 WIP, details pending.
 
+This is just a silly prototype. Don't use this in production.
+
 ## Usage Example
+
+The following example illustrates a real-time, collaborative & persistent
+Todo List with pocktails:
 
 ### Server
 
 ```javascript
-const pocktails = new Pocktails(io) // io is an initialized socket.io instance.
+// Pass `io` as an initialized socket.io instance.
+const pocktails = new Pocktails(io)
 
 pocktails.defineModel('todos', {
   items: [
@@ -46,13 +52,7 @@ pocktails.revive()
 - Pocktails persists the operations on-disk, so restarting the server should
 revive the Todo List as it was before the server was stopped.
 
-## Run Demo
-
-There's a Todo List demo using pocktails in `/demo`.
-
-Add/Remove todos, all tabs should sync immediately. Restarting the server
-should keep the last todo list since the operations are persisted on disk &
-revived on startup.
+## Run Todo List demo
 
 ```bash
 $ npm run demo
