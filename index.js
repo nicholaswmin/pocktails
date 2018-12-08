@@ -4,6 +4,13 @@ const fs = require('fs')
 const pathval = require('pathval')
 const jsondiffpatch = require('jsondiffpatch')
 
+/*
+  @TODO's:
+
+  - Diffing/Patching is unnecessary. The operations themselves could
+    serve as deltas.
+ */
+
 class Pocktails {
   constructor(io) {
     this.models = {}
