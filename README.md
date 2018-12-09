@@ -27,8 +27,8 @@ pocktails.defineModel('todos', {
   ]
 })
 
-// Revive model from previous disk-persisted operations:
-pocktails.revive()
+// Revive models from previous disk-persisted operations:
+pocktails.reviveAll()
 ```
 
 ### Client

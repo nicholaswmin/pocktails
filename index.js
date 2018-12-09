@@ -28,7 +28,7 @@ class Pocktails {
     return this
   }
 
-  revive() {
+  reviveAll() {
     if (!fs.existsSync(this.filename)) return
 
     fs.readFileSync(this.filename, { encoding: 'utf8' })
