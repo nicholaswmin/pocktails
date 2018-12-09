@@ -12,17 +12,17 @@ pocktails.defineModel('todos', {
   items: [
     { id: '64bbd83a-b1ed-4254-9aee-1e4e6d85fdb7', content: 'Get Milk' }
   ]
+}).defineModel('chat', {
+  persons: [],
+  messages: []
 })
 
 // Revive model from previous disk-persisted operations
 pocktails.revive()
 
 app.use('/sdk', express.static(__dirname + '/../sdk'))
-
-app.get('/demo', (req, res) => {
-  res.sendFile(__dirname + '/index.html')
-})
+app.use('/examples', express.static(__dirname + '/../examples/'))
 
 http.listen(3000, () => {
-  console.log('Success! Visit *:3000/demo')
+  console.log('Success! Visit http://localhost:3000/examples')
 })

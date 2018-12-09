@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Pocktails Chat Demo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script src="../sdk/pathval.js"></script>
+    <script src="../sdk/sdk.js"></script>
+
+    <style>
+      body {
+        font-family: sans-serif;
+        font-size: 14px;
+      }
+
+      .chat-container {
+        max-width: 320px;
+        margin: 32px auto;
+        border: 1px solid #ccc;
+        padding: 0px 8px 8px 8px;
+      }
+
+      table {
+        border-collapse: collapse;
+      }
+
+      table {
+        width: 100%;
+      }
+
+      td {
+        border-top: 1px solid #ccc;
+        padding: 4px 8px;
+      }
+
+      #list-wrapper {
+        max-height: 70vh;
+        overflow-y: scroll;
+        margin-bottom: 16px;
+      }
+
+      .sender-label {
+        display: block;
+        margin: 4px 0;
+        font-size: 10px;
+        color: #bbb;
+      }
+
+      input {
+        width: -webkit-fill-available;
+      }
+
+      button {
+        margin: 8px 0px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="chat-container">
+      <h3> Chat </h3>
+
+      <div id="list-wrapper">
+        <table id="list"></table>
+      </div>
+
+      <input
+        id="send-msg-input"
+        type="text"
+        placeholder="Type message here / Press Enter to send."
+        autofocus/>
+    </div>
+
+    <script>
+      const pocktails = new Pocktails()
+
+      class Chat {
+        constructor() {
+          const id = this._getUUID()
+          const name = prompt('Enter your name') || 'User ' + id
+
+          this.me = { id, name }
+          this.sendMsgInput = document.querySelector('#send-msg-input')
+          this.listWrapper = document.querySelector('#list-wrapper')
+          this.list = document.querySelector('#list')
+
+          pocktails.addEventListener('handshake', () => {
+            this._rebuildMessagesList()
+            pocktails.push('chat', 'persons', this.me)
+          })
+          pocktails.addEventListener('update', () => {
+            this._rebuildMessagesList()
+          })
+          this.sendMsgInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') this.sendMsg()
+          })
+        }
+
+        sendMsg() {
+          pocktails.push('chat', 'messages', {
+            id: this._getUUID(),
+            senderId: this.me.id,
+            content: this.sendMsgInput.value
+          })
+
+          this._rebuildMessagesList()
+          this._resetInput()
+        }
+
+        _rebuildMessagesList() {
+          const messagesHTML = pocktails.models.chat.messages
+            .map(message => {
+              const sender = this._getSenderOfMessage(message)
+
+              return `
+                <tr>
+                  <td class="content">
+                    <span class="sender-label">${sender.name} says:</span>
+                    ${message.content}
+                  </td>
+                </tr>
+              `.trim()
+            })
+
+          this.list.innerHTML = messagesHTML.join('')
+          this._scrollMsgListToBottom()
+        }
+
+        _getSenderOfMessage(message) {
+          return pocktails.models.chat.persons.find(person => {
+            return person.id === message.senderId
+          })
+        }
+
+        _getUUID() {
+          return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+            const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8)
+
+            return v.toString(16)
+          })
+        }
+
+        _scrollMsgListToBottom() {
+          this.listWrapper.scrollTop = this.listWrapper.scrollHeight
+        }
+
+        _resetInput() {
+          this.sendMsgInput.value = ''
+        }
+      }
+
+      new Chat()
+    </script>
+  </body>
+</html>

@@ -2,7 +2,10 @@
 
 > Real-time JSON Models
 
-WIP, details pending.
+Define Models on the Server & manipulate them on the Client.
+
+The Models auto-sync with all other connected clients & changes are persisted
+on server.
 
 This is just a silly prototype. Don't use this in production.
 
@@ -36,6 +39,11 @@ pocktails.revive()
 <script>
   const pocktails = new Pocktails()
 
+  pocktails.addEventListener('handshake', () => {
+    // logs the 'todos' model defined on server:
+    console.log(pocktails.models.todos)
+  })
+
   // Edit existing todo:
   pocktails.set('todos', 'items.1.content', 'Get Beer')
 
@@ -50,15 +58,17 @@ pocktails.revive()
 </script>
 ```
 
-- Changes should sync across all connected clients.
-- Pocktails persists the operations on-disk, so restarting the server should
-revive the Todo List as it was before the server was stopped.
+- Changes auto-sync across all connected clients.
+- Changes are persisted on-disk. Restarting the server revives the Todo List as
+  it was before the server was stopped.
 
-## Run Todo List demo
+## Run Examples
+
+Run above example (and others):
 
 ```bash
-$ npm run demo
-# and visit http://localhost:3000/demo
+$ npm run examples
+# and visit http://localhost:3000/examples
 ```
 
 ## Authors
